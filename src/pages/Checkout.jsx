@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CheckCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import api from '../api/axios';
 
@@ -40,7 +41,7 @@ function Checkout() {
       });
 
       clearCart(); // Empty the cart after successful order
-      navigate('/orders', { state: { successMessage: 'Order placed successfully! 🎉' } });
+      navigate('/orders', { state: { successMessage: 'Order placed successfully!' } });
     } catch (error) {
       setErrorMessage(error.response?.data?.message || 'Failed to place order. Please try again.');
     } finally {
@@ -56,7 +57,7 @@ function Checkout() {
   return (
     <div>
       <div className="page-header">
-        <h1>Checkout 📦</h1>
+        <h1>Checkout</h1>
         <p>Enter your delivery address to complete the order</p>
       </div>
 
@@ -94,7 +95,7 @@ function Checkout() {
             </div>
 
             <button type="submit" className="btn btn-primary btn-full" disabled={isLoading}>
-              {isLoading ? 'Placing Order...' : '✅ Place Order'}
+              {isLoading ? 'Placing Order...' : <><CheckCircle size={16} /> Place Order</>}
             </button>
           </form>
         </div>

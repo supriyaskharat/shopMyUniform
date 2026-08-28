@@ -2,15 +2,11 @@
 // Shopping cart page — shows all items, allows quantity changes, and leads to checkout.
 
 import { useNavigate } from 'react-router-dom';
+import { ShoppingCart, Shirt, PartyPopper, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 const FREE_SHIPPING_THRESHOLD = 999;
 const SHIPPING_COST = 99;
-
-const CATEGORY_EMOJI = {
-  shirt: '👔', trouser: '👖', skirt: '👗', blazer: '🧥',
-  tie: '👔', shoes: '👟', shorts: '🩳', pinafore: '👗',
-};
 
 function Cart() {
   const { cartItems, removeFromCart, updateQuantity, cartTotal } = useCart();
@@ -22,7 +18,7 @@ function Cart() {
   if (cartItems.length === 0) {
     return (
       <div className="empty-state">
-        <div className="empty-state-icon">🛒</div>
+        <div className="empty-state-icon"><ShoppingCart size={40} /></div>
         <h3>Your cart is empty</h3>
         <p>Add some uniforms to get started!</p>
         <button className="btn btn-primary" onClick={() => navigate('/products')} style={{ marginTop: '16px' }}>
@@ -35,7 +31,7 @@ function Cart() {
   return (
     <div>
       <div className="page-header">
-        <h1>Shopping Cart 🛒</h1>
+        <h1>Shopping Cart</h1>
         <p>{cartItems.length} item{cartItems.length !== 1 ? 's' : ''} in your cart</p>
       </div>
 
@@ -43,12 +39,11 @@ function Cart() {
         {/* Cart Items List */}
         <div className="card">
           {cartItems.map((item) => {
-            const emoji = CATEGORY_EMOJI[item.product.category] || '👕';
             const itemTotal = item.product.price * item.quantity;
 
             return (
               <div key={`${item.product._id}-${item.size}`} className="cart-item">
-                <div className="cart-item-emoji">{emoji}</div>
+                <div className="cart-item-emoji"><Shirt size={28} /></div>
 
                 <div className="cart-item-info">
                   <p className="cart-item-name">{item.product.name}</p>
@@ -91,7 +86,7 @@ function Cart() {
           </div>
           <div className="summary-row">
             <span>Shipping</span>
-            <span>{shippingCost === 0 ? '🎉 Free' : `₹${shippingCost}`}</span>
+            <span>{shippingCost === 0 ? <><PartyPopper size={14} style={{ verticalAlign: 'text-bottom' }} /> Free</> : `₹${shippingCost}`}</span>
           </div>
           {shippingCost > 0 && (
             <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginBottom: '12px' }}>
@@ -109,7 +104,7 @@ function Cart() {
             onClick={() => navigate('/checkout')}
             style={{ marginTop: '16px' }}
           >
-            Proceed to Checkout →
+            Proceed to Checkout <ArrowRight size={14} />
           </button>
         </div>
       </div>
