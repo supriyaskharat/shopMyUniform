@@ -5,6 +5,9 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+const DEMO_EMAIL = 'test@example.com';
+const DEMO_PASSWORD = 'password123';
+
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,13 +17,12 @@ function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const signIn = async (loginEmail, loginPassword) => {
     setErrorMessage('');
     setIsLoading(true);
 
     try {
-      await login(email, password);
+      await login(loginEmail, loginPassword);
       navigate('/products'); // Redirect to catalog after login
     } catch (error) {
       setErrorMessage(error.response?.data?.message || 'Login failed. Please try again.');
@@ -28,6 +30,13 @@ function Login() {
       setIsLoading(false);
     }
   };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    signIn(email, password);
+  };
+
+  const handleDemoLogin = () => signIn(DEMO_EMAIL, DEMO_PASSWORD);
 
   return (
     <div className="auth-page">
@@ -69,10 +78,15 @@ function Login() {
           </button>
         </form>
 
-        {/* Test account hint for development */}
-        <div className="alert alert-info" style={{ marginTop: '16px' }}>
-          <strong>Test account:</strong> test@example.com / password123
-        </div>
+        <button
+          type="button"
+          className="btn btn-secondary btn-full"
+          style={{ marginTop: '12px' }}
+          onClick={handleDemoLogin}
+          disabled={isLoading}
+        >
+          Demo Login
+        </button>
 
         <p className="auth-link">
           Don't have an account? <Link to="/register">Register here</Link>
