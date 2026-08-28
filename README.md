@@ -75,7 +75,7 @@ npm install
 cd backend
 npm run seed
 ```
-This creates 3 schools, 24 products, and a test user (`test@example.com` / `password123`).
+This creates 3 schools, 42 products, and a test user (`test@example.com` / `password123`).
 
 ### 5. Run both servers
 
