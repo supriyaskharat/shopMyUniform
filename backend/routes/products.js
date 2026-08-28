@@ -7,7 +7,9 @@ const Product = require('../models/Product');
 
 const router = express.Router();
 
-// GET /api/products — List products with optional filters
+const DEFAULT_PAGE_SIZE = 12;
+
+// GET /api/products — List products with optional filters, paginated
 router.get('/', async (req, res, next) => {
   try {
     const { school, grade, category, gender, search, minPrice, maxPrice } = req.query;
@@ -32,11 +34,23 @@ router.get('/', async (req, res, next) => {
       if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
 
-    const products = await Product.find(filter)
-      .populate('school', 'name city')
-      .sort({ createdAt: -1 });
+    const page  = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.max(1, Number(req.query.limit) || DEFAULT_PAGE_SIZE);
 
-    res.json({ success: true, data: products });
+    const [products, total] = await Promise.all([
+      Product.find(filter)
+        .populate('school', 'name city')
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Product.countDocuments(filter),
+    ]);
+
+    res.json({
+      success: true,
+      data: products,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
   } catch (error) {
     next(error);
   }
