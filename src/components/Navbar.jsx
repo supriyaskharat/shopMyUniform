@@ -29,6 +29,18 @@ function Navbar() {
         <School size={20} /> ShopMyUniform
       </Link>
 
+      {/* Mobile-only actions — visible next to the hamburger without opening the menu */}
+      {user && (
+        <div className="navbar-mobile-actions">
+          <Link to="/cart" className="cart-link" onClick={closeMenu}>
+            <ShoppingCart size={20} />
+            {cartCount > 0 && (
+              <span className="cart-badge">{cartCount}</span>
+            )}
+          </Link>
+        </div>
+      )}
+
       {/* Mobile menu toggle */}
       <button
         className="navbar-menu-toggle"
@@ -52,7 +64,7 @@ function Navbar() {
             <li>
               <Link to="/profile" onClick={closeMenu}>Profile</Link>
             </li>
-            <li>
+            <li className="navbar-links-cart">
               {/* Cart icon with item count badge */}
               <Link to="/cart" className="cart-link" onClick={closeMenu}>
                 <ShoppingCart size={16} /> Cart

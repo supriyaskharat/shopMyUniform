@@ -78,6 +78,12 @@ body {
   gap: 8px;
 }
 
+.navbar-mobile-actions {
+  display: none;
+  align-items: center;
+  margin-left: auto;
+}
+
 .navbar-menu-toggle {
   display: none;
   background: none;
@@ -85,6 +91,7 @@ body {
   color: var(--white);
   cursor: pointer;
   padding: 4px;
+  margin-left: 8px;
 }
 
 .navbar-links {
@@ -847,7 +854,9 @@ body {
   .product-detail-layout   { grid-template-columns: 1fr; }
   .product-detail-image    { font-size: 5rem; padding: 36px; }
 
-  .navbar-menu-toggle { display: flex; align-items: center; }
+  .navbar-mobile-actions { display: flex; }
+  .navbar-menu-toggle     { display: flex; align-items: center; }
+  .navbar-links-cart      { display: none; }
 
   .navbar-links {
     display: none;
