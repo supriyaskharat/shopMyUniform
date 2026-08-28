@@ -1,4 +1,4 @@
-# ShopMyUniform 🏫👕
+# ShopMyUniform
 
 A full-stack MERN e-commerce application for school uniform shopping, with an integrated **AI Customer Support Agent** powered by Google Gemini.
 
@@ -9,12 +9,12 @@ A full-stack MERN e-commerce application for school uniform shopping, with an in
 ShopMyUniform lets students and parents browse school uniforms, place orders, and get instant support from an AI assistant that answers questions using live data from the database.
 
 **Key Features:**
-- 🔐 User registration & login (JWT-based)
-- 🎓 Student/Parent profiles with school & grade selection
-- 🛍️ Product catalog with search and filters (category, gender, grade)
-- 🛒 Shopping cart with quantity management
-- 📦 Order placement and order history
-- 🤖 **AI Chat Agent** — Gemini 2.0 Flash with live database lookup (Function Calling)
+- User registration & login (JWT-based)
+- Student/Parent profiles with school & grade selection
+- Product catalog with search and filters (category, gender, grade)
+- Shopping cart with quantity management
+- Order placement and order history
+- **AI Chat Agent** — Gemini 2.0 Flash with live database lookup (Function Calling)
 
 ---
 
