@@ -606,7 +606,7 @@ body {
   bottom: 70px;
   right: 0;
   width: 340px;
-  max-height: min(480px, calc(100vh - 120px));
+  height: min(480px, calc(100vh - 120px));
   background: var(--white);
   border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
@@ -700,6 +700,30 @@ body {
 
 .message.bot strong {
   font-weight: 700;
+}
+
+.chat-suggestions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.chat-suggestion-chip {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  color: var(--primary);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.chat-suggestion-chip:hover {
+  background: var(--bg);
+  border-color: var(--primary);
 }
 
 .typing-indicator {
@@ -894,7 +918,7 @@ body {
     right: 16px;
     left: 16px;
     width: auto;
-    max-height: min(70vh, calc(100vh - 120px));
+    height: min(70vh, calc(100vh - 120px));
   }
 
   .order-card {
