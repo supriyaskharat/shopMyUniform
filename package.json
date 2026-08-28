@@ -1,7 +1,7 @@
 {
   "name": "shopmyuniform",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.7.3",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^6.26.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
