@@ -180,7 +180,7 @@ router.post('/chat', protect, async (req, res) => {
         School: ${user?.school?.name || 'not specified'}.
         Always use the provided tools to look up real data before answering.
         Never guess product availability, sizes, or order status — always check the database.
-        Keep responses concise and friendly. Use ₹ for prices.`,
+        Keep responses concise and friendly. Use ₹ for prices. Do not use emojis.`,
     });
 
     // Gemini only accepts 'user' and 'model' roles — filter out any others.
