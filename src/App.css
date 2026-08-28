@@ -432,6 +432,56 @@ body {
   border-color: var(--primary);
 }
 
+/* ── Loading Skeleton ────────────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, #f0f1f5 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-image {
+  height: 120px;
+  border-radius: 0;
+}
+
+.skeleton-text {
+  height: 0.9rem;
+  width: 100%;
+}
+
+.skeleton-chip {
+  display: inline-block;
+  width: 32px;
+  height: 20px;
+}
+
+.skeleton-button {
+  height: 32px;
+  width: 100%;
+  margin-top: auto;
+  border-radius: var(--radius);
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.pagination-status {
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
 /* ── Empty State ─────────────────────────────────────────────────────────── */
 .empty-state {
   text-align: center;
