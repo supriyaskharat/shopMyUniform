@@ -93,23 +93,23 @@ const buildProducts = (schoolId) => [
 async function seed() {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log('✅ Connected to MongoDB');
+    console.log('Connected to MongoDB');
 
     // Clear all existing data
     await School.deleteMany();
     await Product.deleteMany();
     await User.deleteMany();
     await Order.deleteMany();
-    console.log('🗑️  Cleared existing data');
+    console.log('Cleared existing data');
 
     // Insert schools
     const insertedSchools = await School.insertMany(schools);
-    console.log(`🏫 Inserted ${insertedSchools.length} schools`);
+    console.log(`Inserted ${insertedSchools.length} schools`);
 
     // Insert products for every school
     const allProducts = insertedSchools.flatMap((school) => buildProducts(school._id));
     const insertedProducts = await Product.insertMany(allProducts);
-    console.log(`👕 Inserted ${insertedProducts.length} products`);
+    console.log(`Inserted ${insertedProducts.length} products`);
 
     // Create a test user linked to the first school (Delhi Public School)
     const testUser = await User.create({
@@ -120,7 +120,7 @@ async function seed() {
       school: insertedSchools[0]._id,
       grade: '7',
     });
-    console.log(`👤 Created test user: test@example.com / password123`);
+    console.log(`Created test user: test@example.com / password123`);
 
     // Create sample orders for the test user
     const shirtProduct = insertedProducts.find((p) => p.name === 'Boys White Formal Shirt' && p.school.equals(insertedSchools[0]._id));
@@ -149,10 +149,10 @@ async function seed() {
       estimatedDelivery: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
     });
 
-    console.log('📦 Created 2 sample orders');
-    console.log('\n✅ Seed completed successfully!');
+    console.log('Created 2 sample orders');
+    console.log('\nSeed completed successfully!');
   } catch (error) {
-    console.error('❌ Seed failed:', error.message);
+    console.error('Seed failed:', error.message);
   } finally {
     await mongoose.disconnect();
   }
