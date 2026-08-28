@@ -1,7 +1,7 @@
 // src/components/ChatWidget.jsx
 // The floating AI customer support chat widget.
 // Shows a chat bubble in the bottom-right corner when the user is logged in.
-// Connects to the Gemini-powered backend AI endpoint.
+// Connects to the OpenAI-powered backend AI endpoint.
 
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -33,13 +33,13 @@ function ChatWidget() {
   // Only show the chat widget when the user is logged in
   if (!user) return null;
 
-  // Convert our local message format to the format Gemini expects
+  // Convert our local message format to OpenAI's chat message format
   const buildHistory = () => {
     return messages
       .filter((m) => m.role !== 'bot' || messages.indexOf(m) !== 0) // Skip the initial greeting
       .map((m) => ({
-        role: m.role === 'user' ? 'user' : 'model',
-        parts: [{ text: m.content }],
+        role: m.role === 'user' ? 'user' : 'assistant',
+        content: m.content,
       }));
   };
 
