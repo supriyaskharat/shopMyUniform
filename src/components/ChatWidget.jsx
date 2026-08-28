@@ -4,13 +4,14 @@
 // Connects to the Gemini-powered backend AI endpoint.
 
 import { useState, useRef, useEffect } from 'react';
+import { Bot, X, Send, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 
 // The first message shown when the user opens the chat
 const INITIAL_MESSAGE = {
   role: 'bot',
-  content: "👋 Hi! I'm ShopMyUniform's AI assistant. I can help you find uniforms, check your order status, or answer questions about our policies. How can I help?",
+  content: "Hi! I'm ShopMyUniform's AI assistant. I can help you find uniforms, check your order status, or answer questions about our policies. How can I help?",
 };
 
 function ChatWidget() {
@@ -61,9 +62,10 @@ function ChatWidget() {
       const botMessage = { role: 'bot', content: res.data.data.reply };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
+      console.error('AI chat request failed:', error);
       const errorMessage = {
         role: 'bot',
-        content: '⚠️ Sorry, something went wrong. Please try again.',
+        content: 'Sorry, something went wrong. Please try again.',
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
@@ -85,8 +87,8 @@ function ChatWidget() {
       {isOpen && (
         <div className="chat-window">
           <div className="chat-header">
-            <span>🤖 ShopMyUniform Support</span>
-            <button className="chat-header-close" onClick={() => setIsOpen(false)}>✕</button>
+            <span><Bot size={16} /> ShopMyUniform Support</span>
+            <button className="chat-header-close" onClick={() => setIsOpen(false)}><X size={16} /></button>
           </div>
 
           <div className="chat-messages">
@@ -120,7 +122,7 @@ function ChatWidget() {
               disabled={isLoading}
             />
             <button className="chat-send-btn" onClick={sendMessage} disabled={isLoading}>
-              ➤
+              <Send size={16} />
             </button>
           </div>
         </div>
@@ -132,7 +134,7 @@ function ChatWidget() {
         onClick={() => setIsOpen((prev) => !prev)}
         title="Chat with our AI support"
       >
-        {isOpen ? '✕' : '💬'}
+        {isOpen ? <X size={22} /> : <MessageCircle size={22} />}
       </button>
     </div>
   );
