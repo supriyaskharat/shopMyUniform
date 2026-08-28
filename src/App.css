@@ -125,6 +125,12 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+}
+
+.cart-link:hover {
+  color: var(--white);
 }
 
 .cart-badge {
@@ -264,6 +270,38 @@ body {
 .alert-info    { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
 
 /* ── Page Header ─────────────────────────────────────────────────────────── */
+/* ── Breadcrumbs ─────────────────────────────────────────────────────────── */
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+}
+
+.breadcrumbs a {
+  color: var(--text-light);
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.breadcrumbs [aria-current="page"] {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-light);
+}
+
 .page-header {
   margin-bottom: 24px;
 }

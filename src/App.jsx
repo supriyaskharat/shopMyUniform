@@ -5,6 +5,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import Breadcrumbs from './components/Breadcrumbs';
 import ChatWidget from './components/ChatWidget';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -47,6 +48,7 @@ function App() {
     <>
       <Navbar />
       <main className="main-content">
+        <Breadcrumbs />
         <Routes>
           <Route path="/" element={<Navigate to="/products" replace />} />
           <Route path="/login" element={<Login />} />
