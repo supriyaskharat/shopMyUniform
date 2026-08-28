@@ -1,65 +1,77 @@
 // routes/ai.js
-// AI customer support agent powered by Google Gemini function calling.
-// Gemini picks a tool based on the user's question, we run the real DB query,
-// and send the result back so Gemini can answer with grounded data.
+// AI customer support agent powered by OpenAI function calling.
+// The model picks a tool based on the user's question, we run the real DB query,
+// and send the result back so it can answer with grounded data.
 
 const express = require('express');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const OpenAI = require('openai');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
+const OPENAI_MODEL = 'gpt-4o-mini';
 
-// Tools Gemini can call, with the parameters each one accepts.
+// Tools the model can call, with the parameters each one accepts.
 const tools = [
   {
-    functionDeclarations: [
-      {
-        name: 'getProducts',
-        description:
-          'Search for school uniform products in the store. Use this when the user asks about product availability, sizes, categories, or prices.',
-        parameters: {
-          type: 'OBJECT',
-          properties: {
-            grade:     { type: 'STRING', description: 'Grade level, e.g. "7" or "10"' },
-            category:  { type: 'STRING', description: 'shirt, trouser, skirt, blazer, tie, shoes, shorts, or pinafore' },
-            gender:    { type: 'STRING', description: 'boys, girls, or unisex' },
-            search:    { type: 'STRING', description: 'Text to search in product names' },
-            schoolId:  { type: 'STRING', description: "MongoDB ObjectId of the user's school" },
-          },
-          required: [],
+    type: 'function',
+    function: {
+      name: 'getProducts',
+      description:
+        'Search for school uniform products in the store. Use this when the user asks about product availability, sizes, categories, or prices.',
+      parameters: {
+        type: 'object',
+        properties: {
+          grade:     { type: 'string', description: 'Grade level, e.g. "7" or "10"' },
+          category:  { type: 'string', description: 'shirt, trouser, skirt, blazer, tie, shoes, shorts, or pinafore' },
+          gender:    { type: 'string', description: 'boys, girls, or unisex' },
+          search:    { type: 'string', description: 'Text to search in product names' },
+          schoolId:  { type: 'string', description: "MongoDB ObjectId of the user's school" },
         },
+        required: [],
       },
-      {
-        name: 'getMyOrders',
-        description:
-          "Get all orders placed by the currently logged-in user. Use this when the user asks about their order history or 'Where is my order?'",
-        parameters: { type: 'OBJECT', properties: {}, required: [] },
-      },
-      {
-        name: 'getOrderById',
-        description: 'Get details of one specific order using its order number.',
-        parameters: {
-          type: 'OBJECT',
-          properties: {
-            orderNumber: { type: 'STRING', description: 'Order number like ORD-20240829-12345' },
-          },
-          required: ['orderNumber'],
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'getMyOrders',
+      description:
+        "Get all orders placed by the currently logged-in user. Use this when the user asks about their order history or 'Where is my order?'",
+      parameters: { type: 'object', properties: {}, required: [] },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'getOrderById',
+      description: 'Get details of one specific order using its order number.',
+      parameters: {
+        type: 'object',
+        properties: {
+          orderNumber: { type: 'string', description: 'Order number like ORD-20240829-12345' },
         },
+        required: ['orderNumber'],
       },
-      {
-        name: 'getDeliveryInfo',
-        description: 'Get information about delivery timelines, shipping costs, and coverage.',
-        parameters: { type: 'OBJECT', properties: {}, required: [] },
-      },
-      {
-        name: 'getReturnPolicy',
-        description: 'Get information about how to return or exchange items.',
-        parameters: { type: 'OBJECT', properties: {}, required: [] },
-      },
-    ],
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'getDeliveryInfo',
+      description: 'Get information about delivery timelines, shipping costs, and coverage.',
+      parameters: { type: 'object', properties: {}, required: [] },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'getReturnPolicy',
+      description: 'Get information about how to return or exchange items.',
+      parameters: { type: 'object', properties: {}, required: [] },
+    },
   },
 ];
 
@@ -82,7 +94,7 @@ async function executeTool(toolName, args, userId, userSchoolId) {
         return { found: false, message: 'No products found matching the criteria.' };
       }
 
-      // Return a clean summary of each product for Gemini to use
+      // Return a clean summary of each product for the model to use
       return products.map((p) => ({
         name: p.name,
         category: p.category,
@@ -170,13 +182,13 @@ router.post('/chat', protect, async (req, res) => {
     // Get current user's info to personalise the AI context
     const user = await User.findById(req.user._id).populate('school', 'name');
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-3.6-flash',
-      tools,
-      systemInstruction: `You are a friendly and helpful customer support agent for ShopMyUniform, 
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const systemMessage = {
+      role: 'system',
+      content: `You are a friendly and helpful customer support agent for ShopMyUniform,
         an online school uniform store in India.
-        Current user: ${user?.name || 'Customer'}, Grade: ${user?.grade || 'not specified'}, 
+        Current user: ${user?.name || 'Customer'}, Grade: ${user?.grade || 'not specified'},
         School: ${user?.school?.name || 'not specified'}.
         Always use the provided tools to look up real data before answering.
         Never guess product availability, sizes, or order status — always check the database.
@@ -184,46 +196,52 @@ router.post('/chat', protect, async (req, res) => {
         Format structured details (order status, items, price) as a compact markdown
         bullet list — one "-" per field, no blank lines between bullets or between a
         heading and its list. Never put each field on its own paragraph.`,
-    });
+    };
 
-    // Gemini only accepts 'user' and 'model' roles — filter out any others.
-    const contents = [
-      ...(history || []).filter((e) => e.role === 'user' || e.role === 'model'),
-      { role: 'user', parts: [{ text: message }] },
+    // Only user/assistant turns are valid history — tool-call turns aren't replayed across requests.
+    const messages = [
+      systemMessage,
+      ...(history || []).filter((e) => e.role === 'user' || e.role === 'assistant'),
+      { role: 'user', content: message },
     ];
 
-    let result = await model.generateContent({ contents });
-    let response = result.response;
+    let response = await openai.chat.completions.create({
+      model: OPENAI_MODEL,
+      messages,
+      tools,
+    });
+    let responseMessage = response.choices[0].message;
 
-    // Keep calling tools until Gemini gives a final text reply
-    while (response.functionCalls()?.length > 0) {
-      const calls = response.functionCalls();
+    // Keep calling tools until the model gives a final text reply
+    while (responseMessage.tool_calls?.length > 0) {
+      messages.push(responseMessage);
 
-      contents.push({ role: 'model', parts: response.candidates[0].content.parts });
-
-      const toolResultParts = await Promise.all(
-        calls.map(async (call) => ({
-          functionResponse: {
-            name: call.name,
-            response: {
-              result: await executeTool(
-                call.name,
-                call.args,
-                req.user._id,
-                user?.school?._id?.toString()
-              ),
-            },
-          },
+      const toolResults = await Promise.all(
+        responseMessage.tool_calls.map(async (call) => ({
+          role: 'tool',
+          tool_call_id: call.id,
+          content: JSON.stringify(
+            await executeTool(
+              call.function.name,
+              JSON.parse(call.function.arguments || '{}'),
+              req.user._id,
+              user?.school?._id?.toString()
+            )
+          ),
         }))
       );
 
-      contents.push({ role: 'user', parts: toolResultParts });
-      result = await model.generateContent({ contents });
-      response = result.response;
+      messages.push(...toolResults);
+
+      response = await openai.chat.completions.create({
+        model: OPENAI_MODEL,
+        messages,
+        tools,
+      });
+      responseMessage = response.choices[0].message;
     }
 
-    const reply = response.text();
-    res.json({ success: true, data: { reply } });
+    res.json({ success: true, data: { reply: responseMessage.content } });
   } catch (error) {
     console.error('AI chat error:', error.message);
     res.status(500).json({ success: false, message: 'AI service error. Please try again.' });
