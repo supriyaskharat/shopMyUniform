@@ -172,7 +172,7 @@ router.post('/chat', protect, async (req, res) => {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.6-flash',
       tools,
       systemInstruction: `You are a friendly and helpful customer support agent for ShopMyUniform, 
         an online school uniform store in India.
