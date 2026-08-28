@@ -668,7 +668,7 @@ body {
   border-bottom-right-radius: 2px;
 }
 
-/* Gemini's markdown is often "loose" (blank lines between bullets), which
+/* The model's markdown can be "loose" (blank lines between bullets), which
    turns every level into its own paragraph. Only direct children of the
    bubble carry spacing; everything nested is forced tight. */
 .message.bot > * {
