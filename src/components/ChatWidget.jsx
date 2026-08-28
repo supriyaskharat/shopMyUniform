@@ -15,6 +15,14 @@ const INITIAL_MESSAGE = {
   content: "Hi! I'm ShopMyUniform's AI assistant. I can help you find uniforms, check your order status, or answer questions about our policies. How can I help?",
 };
 
+// Quick-reply prompts shown before the user has sent their first message
+const SUGGESTED_QUERIES = [
+  'Where is my order?',
+  'Do you have white shirts for Grade 7?',
+  'How long will delivery take?',
+  'I want to exchange my shirt',
+];
+
 function ChatWidget() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -43,8 +51,8 @@ function ChatWidget() {
       }));
   };
 
-  const sendMessage = async () => {
-    const trimmedMessage = inputValue.trim();
+  const sendMessage = async (overrideText) => {
+    const trimmedMessage = (overrideText ?? inputValue).trim();
     if (!trimmedMessage || isLoading) return;
 
     // Add user's message to the chat
@@ -82,6 +90,9 @@ function ChatWidget() {
     }
   };
 
+  // Only offer suggestions before the conversation has started
+  const showSuggestions = messages.length === 1 && !isLoading;
+
   return (
     <div className="chat-widget">
       {/* Chat Window — shown when isOpen is true */}
@@ -109,6 +120,21 @@ function ChatWidget() {
                 <span className="typing-dot" />
                 <span className="typing-dot" />
                 <span className="typing-dot" />
+              </div>
+            )}
+
+            {/* Quick-reply suggestions before the user sends their first message */}
+            {showSuggestions && (
+              <div className="chat-suggestions">
+                {SUGGESTED_QUERIES.map((query) => (
+                  <button
+                    key={query}
+                    className="chat-suggestion-chip"
+                    onClick={() => sendMessage(query)}
+                  >
+                    {query}
+                  </button>
+                ))}
               </div>
             )}
 
