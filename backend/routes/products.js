@@ -8,22 +8,22 @@ const Product = require('../models/Product');
 const router = express.Router();
 
 // GET /api/products — List products with optional filters
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
   try {
     const { school, grade, category, gender, search, minPrice, maxPrice } = req.query;
 
     // Build the filter object dynamically based on what was provided
     const filter = {};
 
-    if (school)    filter.school = school;
-    if (category)  filter.category = category;
-    if (gender)    filter.gender = gender;
+    if (school)    filter.school = String(school);
+    if (category)  filter.category = String(category);
+    if (gender)    filter.gender = String(gender);
 
     // grades is an array field — check if the grade value is in the array
-    if (grade)     filter.grades = grade;
+    if (grade)     filter.grades = String(grade);
 
     // Case-insensitive text search on the product name
-    if (search)    filter.name = { $regex: search, $options: 'i' };
+    if (search)    filter.name = { $regex: String(search), $options: 'i' };
 
     // Price range filter
     if (minPrice || maxPrice) {
@@ -38,12 +38,12 @@ router.get('/', async (req, res) => {
 
     res.json({ success: true, data: products });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 });
 
 // GET /api/products/:id — Get a single product's full details
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id).populate('school', 'name city');
     if (!product) {
@@ -51,7 +51,7 @@ router.get('/:id', async (req, res) => {
     }
     res.json({ success: true, data: product });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 });
 
