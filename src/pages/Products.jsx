@@ -3,6 +3,7 @@
 // Fetches products from the backend whenever filters change.
 
 import { useState, useEffect, useCallback } from 'react';
+import { Search, X, Shirt } from 'lucide-react';
 import api from '../api/axios';
 import ProductCard from '../components/ProductCard';
 
@@ -56,19 +57,22 @@ function Products() {
   return (
     <div>
       <div className="page-header">
-        <h1>School Uniforms Catalog 👕</h1>
+        <h1>School Uniforms Catalog</h1>
         <p>Find the right uniforms for your school and grade</p>
       </div>
 
       {/* Filters Bar */}
       <div className="filters-bar">
-        <input
-          type="text"
-          className="form-input"
-          placeholder="🔍 Search products..."
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-        />
+        <div className="search-input-wrap">
+          <Search size={16} />
+          <input
+            type="text"
+            className="form-input"
+            placeholder="Search products..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
+        </div>
 
         <select
           className="form-select"
@@ -109,7 +113,7 @@ function Products() {
 
         {hasActiveFilters && (
           <button className="btn btn-secondary btn-sm" onClick={clearFilters}>
-            ✕ Clear Filters
+            <X size={14} /> Clear Filters
           </button>
         )}
       </div>
@@ -121,7 +125,7 @@ function Products() {
         </div>
       ) : products.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">👕</div>
+          <div className="empty-state-icon"><Shirt size={40} /></div>
           <h3>No products found</h3>
           <p>Try changing your filters or search term</p>
         </div>

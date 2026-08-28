@@ -4,14 +4,10 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Shirt, School, ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
-
-const CATEGORY_EMOJI = {
-  shirt: '👔', trouser: '👖', skirt: '👗', blazer: '🧥',
-  tie: '👔', shoes: '👟', shorts: '🩳', pinafore: '👗',
-};
 
 function ProductDetail() {
   const { id } = useParams();
@@ -43,7 +39,7 @@ function ProductDetail() {
       return;
     }
     addToCart(product, selectedSize, quantity);
-    setSuccessMessage(`✅ Added ${quantity}x ${product.name} (${selectedSize}) to your cart!`);
+    setSuccessMessage(`Added ${quantity}x ${product.name} (${selectedSize}) to your cart!`);
     setTimeout(() => setSuccessMessage(''), 3000); // Clear message after 3 seconds
   };
 
@@ -53,22 +49,20 @@ function ProductDetail() {
 
   if (!product) return null;
 
-  const emoji = CATEGORY_EMOJI[product.category] || '👕';
-
   return (
     <div>
       <button className="btn btn-secondary btn-sm" onClick={() => navigate(-1)} style={{ marginBottom: '20px' }}>
-        ← Back
+        <ArrowLeft size={14} /> Back
       </button>
 
       <div className="product-detail-layout">
-        {/* Product Image (emoji placeholder) */}
-        <div className="product-detail-image">{emoji}</div>
+        {/* Product Image placeholder */}
+        <div className="product-detail-image"><Shirt size={64} /></div>
 
         {/* Product Info */}
         <div className="product-detail-info">
           <p style={{ color: 'var(--text-light)', textTransform: 'capitalize' }}>
-            {product.category} · {product.gender} · 🏫 {product.school?.name}
+            {product.category} · {product.gender} · <School size={14} style={{ verticalAlign: 'text-bottom' }} /> {product.school?.name}
           </p>
           <h1>{product.name}</h1>
 
@@ -116,7 +110,7 @@ function ProductDetail() {
 
           <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
             <button className="btn btn-primary" onClick={handleAddToCart}>
-              🛒 Add to Cart
+              <ShoppingCart size={16} /> Add to Cart
             </button>
             <button className="btn btn-secondary" onClick={() => navigate('/cart')}>
               View Cart
