@@ -3,8 +3,10 @@
 // Run with: npm run seed  (from the backend/ directory)
 // WARNING: This will delete all existing data before inserting fresh seed data.
 
-require('dotenv').config({ path: '../.env' });
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const mongoose = require('mongoose');
+
 const School   = require('../models/School');
 const Product  = require('../models/Product');
 const User     = require('../models/User');
