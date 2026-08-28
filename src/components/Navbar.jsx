@@ -3,6 +3,7 @@
 // Shows different links depending on whether the user is logged in.
 
 import { Link, useNavigate } from 'react-router-dom';
+import { School, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 
@@ -20,7 +21,7 @@ function Navbar() {
     <nav className="navbar">
       {/* Logo */}
       <Link to="/products" className="navbar-logo">
-        🏫 ShopMyUniform
+        <School size={20} /> ShopMyUniform
       </Link>
 
       {/* Navigation Links */}
@@ -40,7 +41,7 @@ function Navbar() {
             <li>
               {/* Cart icon with item count badge */}
               <Link to="/cart" className="cart-link">
-                🛒 Cart
+                <ShoppingCart size={16} /> Cart
                 {cartCount > 0 && (
                   <span className="cart-badge">{cartCount}</span>
                 )}

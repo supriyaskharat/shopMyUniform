@@ -3,31 +3,19 @@
 // Clicking "View Details" navigates to the full product page.
 
 import { useNavigate } from 'react-router-dom';
-
-// Map each product category to a descriptive emoji
-const CATEGORY_EMOJI = {
-  shirt:    '👔',
-  trouser:  '👖',
-  skirt:    '👗',
-  blazer:   '🧥',
-  tie:      '👔',
-  shoes:    '👟',
-  shorts:   '🩳',
-  pinafore: '👗',
-};
+import { Shirt, School } from 'lucide-react';
 
 function ProductCard({ product }) {
   const navigate = useNavigate();
-  const emoji = CATEGORY_EMOJI[product.category] || '👕';
 
   return (
     <div className="product-card">
-      {/* Product image placeholder using emoji */}
-      <div className="product-card-image">{emoji}</div>
+      {/* Product image placeholder */}
+      <div className="product-card-image"><Shirt size={40} /></div>
 
       <div className="product-card-body">
         <p className="product-name">{product.name}</p>
-        <p className="product-school">🏫 {product.school?.name || 'All Schools'}</p>
+        <p className="product-school"><School size={14} /> {product.school?.name || 'All Schools'}</p>
 
         {/* Show available sizes as small chips */}
         <div className="size-chips">
