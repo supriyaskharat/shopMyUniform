@@ -14,7 +14,8 @@ ShopMyUniform lets students and parents browse school uniforms, place orders, an
 - Product catalog with search and filters (category, gender, grade)
 - Shopping cart with quantity management
 - Order placement and order history
-- **AI Chat Agent** — OpenAI (gpt-4o-mini) with live database lookup (Function Calling)
+- **AI Chat Agent** — OpenAI (gpt-4o-mini) with live database lookup (Function Calling), scoped to store topics only
+- Responsive layout — usable on both desktop and mobile
 
 ---
 
@@ -226,6 +227,13 @@ User sees grounded answer
 5. Results sent back to the model
 6. Model responds: *"Your latest order ORD-20240829-45678 is currently shipped and expected by Sept 5."*
 
+### Guardrails
+The assignment scopes the agent to products, sizes, delivery, orders, and returns/exchanges — so the system prompt enforces that scope explicitly:
+- **Topic lock** — off-topic requests (e.g. "write me a Python function") get a polite decline instead of an answer, since an unscoped LLM behind a support widget is both off-brief and a support-cost/abuse risk.
+- **Prompt-injection resistance** — the system prompt tells the model to ignore any instruction embedded in a user message that tries to override its role or these rules.
+- **Grounded-only answers** — the model is told to always call a tool rather than guess; there's no path for it to state a product's availability, size, or an order's status from its own general knowledge.
+- **Auth-scoped tools** — `getMyOrders`/`getOrderById` query `Order.find({ user: req.user._id })`, so the model can only ever see the logged-in user's own orders, never another user's.
+
 ---
 
 ## Deployment
@@ -252,3 +260,34 @@ After running `npm run seed`:
 - **Password:** password123
 - School: Delhi Public School, Grade: 7
 - Has 2 sample orders (shipped + delivered)
+
+The Login page also has a **Demo Login** button that signs in with this account directly, so a reviewer doesn't need to type credentials by hand.
+
+---
+
+## Code Quality & Architecture
+
+Principles this codebase follows, and where to see them:
+
+### KISS — keep it simple
+- **Plain React Context** (`AuthContext`, `CartContext`) instead of Redux/Zustand — the app's state is small enough that a state management library would be pure overhead.
+- **Cart lives in memory**, not persisted — acceptable for the assignment's scope and called out as a known limitation rather than engineered around.
+- **No premature abstraction** — the five AI tools, the four route files, and the page components each do one thing directly; nothing is factored into a generic "handler builder" or similar layer that isn't needed yet.
+
+### DRY — don't repeat yourself
+- **Centralized error handling** — every route calls `next(error)` on failure instead of duplicating `try/catch` + `res.status(500).json(...)` boilerplate in each handler. One error-formatting middleware in `server.js` owns the response shape and keeps internal error details (e.g. raw Mongoose messages) from leaking to the client.
+- **A single shared `axios` instance** (`src/api/axios.js`) carries the JWT-attach and 401-redirect logic once, instead of repeating auth headers and error handling at every call site.
+
+### Separation of concerns
+- Routes only orchestrate: parse the request, call Mongoose, shape the response. Business rules (password hashing, JWT signing) live in models/middleware, not scattered across routes.
+- The AI route's tool declarations, tool executor, and the chat endpoint itself are three distinct pieces — the executor has zero knowledge of OpenAI's API shape, so swapping providers (this project moved from Gemini to OpenAI mid-build) only touched the request/response translation layer, not the tool logic.
+
+### Security-by-default
+- **Prices are always server-recomputed** from the database at order time (`orders.js`) — the client can never set what it pays.
+- **Order ownership is enforced at the query level** (`Order.findOne({ _id, user: req.user._id })`), not checked after the fact.
+- **Query-derived Mongo filters are type-coerced** (`String(...)`) before use, closing a NoSQL-injection surface where an object could be smuggled in through a query param.
+- **AI tool access is scoped to the authenticated user** — see [Guardrails](#guardrails) above.
+
+### Responsive & accessible UI
+- Mobile breakpoints collapse the navbar into a hamburger menu, dock the AI chat widget to the screen edges, and stack cart/order rows instead of squeezing a desktop layout into a small viewport.
+- Icons (`lucide-react`) are used instead of emoji throughout, for a consistent, theme-independent visual language.
