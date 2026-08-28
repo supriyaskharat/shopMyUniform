@@ -12,7 +12,7 @@ const router = express.Router();
 const DELIVERY_DAYS = 7; // Estimated delivery in 7 days from order placement
 
 // GET /api/orders — Get all orders placed by the logged-in user
-router.get('/', protect, async (req, res) => {
+router.get('/', protect, async (req, res, next) => {
   try {
     const orders = await Order.find({ user: req.user._id })
       .populate('items.product', 'name category')
@@ -20,13 +20,13 @@ router.get('/', protect, async (req, res) => {
 
     res.json({ success: true, data: orders });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 });
 
 // POST /api/orders — Place a new order
 // Body: { items: [{ productId, size, quantity }], shippingAddress: {...} }
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, async (req, res, next) => {
   try {
     const { items, shippingAddress } = req.body;
 
@@ -69,12 +69,12 @@ router.post('/', protect, async (req, res) => {
 
     res.status(201).json({ success: true, data: order });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 });
 
 // GET /api/orders/:id — Get a single order's details (must belong to logged-in user)
-router.get('/:id', protect, async (req, res) => {
+router.get('/:id', protect, async (req, res, next) => {
   try {
     const order = await Order.findOne({
       _id: req.params.id,
@@ -87,7 +87,7 @@ router.get('/:id', protect, async (req, res) => {
 
     res.json({ success: true, data: order });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 });
 

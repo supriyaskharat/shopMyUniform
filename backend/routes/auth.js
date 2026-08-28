@@ -28,7 +28,7 @@ const sanitizeUser = (user) => ({
 });
 
 // POST /api/auth/register — Create a new user account
-router.post('/register', async (req, res) => {
+router.post('/register', async (req, res, next) => {
   try {
     const { name, email, password, role } = req.body;
 
@@ -44,12 +44,12 @@ router.post('/register', async (req, res) => {
 
     res.status(201).json({ success: true, data: { token, user: sanitizeUser(user) } });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 });
 
 // POST /api/auth/login — Log in with email and password
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -68,23 +68,23 @@ router.post('/login', async (req, res) => {
     const token = generateToken(user._id);
     res.json({ success: true, data: { token, user: sanitizeUser(user) } });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 });
 
 // GET /api/auth/me — Get the currently logged-in user's profile
-router.get('/me', protect, async (req, res) => {
+router.get('/me', protect, async (req, res, next) => {
   try {
     // req.user is set by the protect middleware
     const user = await User.findById(req.user._id).populate('school', 'name city grades');
     res.json({ success: true, data: sanitizeUser(user) });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 });
 
 // PUT /api/auth/me — Update the current user's name, school, and grade
-router.put('/me', protect, async (req, res) => {
+router.put('/me', protect, async (req, res, next) => {
   try {
     const { name, school, grade } = req.body;
 
@@ -96,7 +96,7 @@ router.put('/me', protect, async (req, res) => {
 
     res.json({ success: true, data: sanitizeUser(updatedUser) });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 });
 

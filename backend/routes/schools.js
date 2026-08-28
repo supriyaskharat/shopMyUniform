@@ -8,17 +8,17 @@ const School = require('../models/School');
 const router = express.Router();
 
 // GET /api/schools — Get all schools
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
   try {
     const schools = await School.find().sort({ name: 1 });
     res.json({ success: true, data: schools });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 });
 
 // GET /api/schools/:id — Get a single school by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
   try {
     const school = await School.findById(req.params.id);
     if (!school) {
@@ -26,7 +26,7 @@ router.get('/:id', async (req, res) => {
     }
     res.json({ success: true, data: school });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 });
 
