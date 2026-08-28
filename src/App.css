@@ -652,18 +652,24 @@ body {
   border-bottom-right-radius: 2px;
 }
 
-.message.bot p {
+/* Gemini's markdown is often "loose" (blank lines between bullets), which
+   turns every level into its own paragraph. Only direct children of the
+   bubble carry spacing; everything nested is forced tight. */
+.message.bot > * {
   margin: 0 0 8px;
+}
+
+.message.bot > *:last-child {
+  margin-bottom: 0;
 }
 
 .message.bot ul,
 .message.bot ol {
-  margin: 0 0 8px;
   padding-left: 20px;
 }
 
 .message.bot li {
-  margin-bottom: 4px;
+  margin: 0;
 }
 
 .message.bot li > p {
@@ -671,8 +677,9 @@ body {
   margin: 0;
 }
 
-.message.bot :last-child {
-  margin-bottom: 0;
+.message.bot li > ul,
+.message.bot li > ol {
+  margin: 4px 0 0;
 }
 
 .message.bot strong {
