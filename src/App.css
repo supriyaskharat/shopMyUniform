@@ -651,6 +651,29 @@ body {
   border-bottom-right-radius: 2px;
 }
 
+.message.bot p {
+  margin: 0 0 8px;
+}
+
+.message.bot p:last-child {
+  margin-bottom: 0;
+}
+
+.message.bot ul,
+.message.bot ol {
+  margin: 0 0 8px;
+  padding-left: 20px;
+}
+
+.message.bot ul:last-child,
+.message.bot ol:last-child {
+  margin-bottom: 0;
+}
+
+.message.bot strong {
+  font-weight: 700;
+}
+
 .typing-indicator {
   display: flex;
   gap: 4px;

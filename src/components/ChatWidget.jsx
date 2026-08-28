@@ -4,6 +4,7 @@
 // Connects to the Gemini-powered backend AI endpoint.
 
 import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { Bot, X, Send, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
@@ -94,7 +95,11 @@ function ChatWidget() {
           <div className="chat-messages">
             {messages.map((msg, index) => (
               <div key={index} className={`message ${msg.role}`}>
-                {msg.content}
+                {msg.role === 'bot' ? (
+                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                ) : (
+                  msg.content
+                )}
               </div>
             ))}
 
