@@ -1,6 +1,6 @@
 # ShopMyUniform
 
-A full-stack MERN e-commerce application for school uniform shopping, with an integrated **AI Customer Support Agent** powered by Google Gemini.
+A full-stack MERN e-commerce application for school uniform shopping, with an integrated **AI Customer Support Agent** powered by OpenAI.
 
 ---
 
@@ -14,7 +14,7 @@ ShopMyUniform lets students and parents browse school uniforms, place orders, an
 - Product catalog with search and filters (category, gender, grade)
 - Shopping cart with quantity management
 - Order placement and order history
-- **AI Chat Agent** — Gemini 2.0 Flash with live database lookup (Function Calling)
+- **AI Chat Agent** — OpenAI (gpt-4o-mini) with live database lookup (Function Calling)
 
 ---
 
@@ -31,13 +31,13 @@ ShopMyUniform lets students and parents browse school uniforms, place orders, an
 - **Mongoose** — MongoDB object modeling
 - **bcryptjs** — Password hashing
 - **jsonwebtoken** — JWT authentication
-- **@google/generative-ai** — Gemini AI SDK
+- **openai** — OpenAI SDK
 
 ### Database
 - **MongoDB Atlas** — Cloud-hosted database
 
 ### AI
-- **Google Gemini 2.0 Flash** — LLM with Function Calling
+- **OpenAI gpt-4o-mini** — LLM with Function Calling
 - The AI calls real MongoDB queries before generating responses
 
 ---
@@ -47,7 +47,7 @@ ShopMyUniform lets students and parents browse school uniforms, place orders, an
 ### Prerequisites
 - Node.js 18+
 - MongoDB Atlas cluster (or local MongoDB)
-- Google Gemini API key ([get free key here](https://aistudio.google.com/app/apikey))
+- OpenAI API key ([get one here](https://platform.openai.com/api-keys))
 
 ### 1. Clone the repository
 ```bash
@@ -100,7 +100,7 @@ npm run dev
 ```
 MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/shopmyuniform
 JWT_SECRET=your_long_random_secret_key
-GEMINI_API_KEY=your_gemini_api_key
+OPENAI_API_KEY=your_openai_api_key
 PORT=5000
 FRONTEND_URL=http://localhost:5173
 ```
@@ -194,17 +194,17 @@ VITE_API_URL=https://your-backend.onrender.com/api
 
 ## AI Architecture
 
-The AI agent uses **Gemini Function Calling** (Tool Use) — not predefined responses.
+The AI agent uses **OpenAI Function Calling** (Tool Use) — not predefined responses.
 
 ```
 User Message
     ↓
-Gemini 2.0 Flash
+gpt-4o-mini
 (with tool declarations)
     ↓ decides which tool to call
 executeTool() runs MongoDB query
     ↓ returns real data
-Gemini generates natural response
+Model generates natural response
     ↓
 User sees grounded answer
 ```
@@ -220,11 +220,11 @@ User sees grounded answer
 
 **Example flow for "Where is my order?":**
 1. User sends message from chat widget
-2. Backend sends it to Gemini with tool declarations
-3. Gemini calls `getMyOrders` tool
+2. Backend sends it to OpenAI with tool declarations
+3. Model calls `getMyOrders` tool
 4. Backend queries `Order.find({ user: userId })` from MongoDB
-5. Results sent back to Gemini
-6. Gemini responds: *"Your latest order ORD-20240829-45678 is currently shipped and expected by Sept 5."*
+5. Results sent back to the model
+6. Model responds: *"Your latest order ORD-20240829-45678 is currently shipped and expected by Sept 5."*
 
 ---
 
