@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GraduationCap, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 function Register() {
@@ -46,7 +47,7 @@ function Register() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>Create account 🎒</h1>
+        <h1>Create account</h1>
         <p>Join ShopMyUniform to order school uniforms</p>
 
         {errorMessage && (
@@ -85,14 +86,14 @@ function Register() {
                 className={`role-option ${role === 'student' ? 'selected' : ''}`}
                 onClick={() => setRole('student')}
               >
-                <div className="role-icon">🎓</div>
+                <div className="role-icon"><GraduationCap size={24} /></div>
                 <div className="role-label">Student</div>
               </div>
               <div
                 className={`role-option ${role === 'parent' ? 'selected' : ''}`}
                 onClick={() => setRole('parent')}
               >
-                <div className="role-icon">👨‍👩‍👧</div>
+                <div className="role-icon"><Users size={24} /></div>
                 <div className="role-label">Parent</div>
               </div>
             </div>
