@@ -22,3 +22,23 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment variables — never commit secrets
+.env
+.env.*
+!.env.example
+
+# Assignment brief — keep private
+take-home-assignment.md
+
+# AI coding assistant artifacts
+.gemini/
+.cursor/
+.cursorignore
+.cursorrules
+.aider*
+.continue/
+.github/copilot*
+CLAUDE.md
+AGENTS.md
+.agent*
