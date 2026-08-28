@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Package } from 'lucide-react';
 import api from '../api/axios';
 
 function Orders() {
@@ -27,7 +28,7 @@ function Orders() {
   return (
     <div>
       <div className="page-header">
-        <h1>My Orders 📦</h1>
+        <h1>My Orders</h1>
         <p>Track your uniform orders</p>
       </div>
 
@@ -37,7 +38,7 @@ function Orders() {
 
       {orders.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">📦</div>
+          <div className="empty-state-icon"><Package size={40} /></div>
           <h3>No orders yet</h3>
           <p>Once you place an order, it will appear here</p>
           <button className="btn btn-primary" onClick={() => navigate('/products')} style={{ marginTop: '16px' }}>

@@ -3,16 +3,17 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, ClipboardList, Settings, Truck, CheckCircle, Calendar, Phone } from 'lucide-react';
 import api from '../api/axios';
 
 // The four stages of an order in sequence
 const ORDER_STAGES = ['placed', 'processing', 'shipped', 'delivered'];
 
-const STAGE_EMOJI = {
-  placed:     '📋',
-  processing: '⚙️',
-  shipped:    '🚚',
-  delivered:  '✅',
+const STAGE_ICON = {
+  placed:     ClipboardList,
+  processing: Settings,
+  shipped:    Truck,
+  delivered:  CheckCircle,
 };
 
 function OrderDetail() {
@@ -37,7 +38,7 @@ function OrderDetail() {
   return (
     <div>
       <button className="btn btn-secondary btn-sm" onClick={() => navigate('/orders')} style={{ marginBottom: '20px' }}>
-        ← Back to Orders
+        <ArrowLeft size={14} /> Back to Orders
       </button>
 
       <div className="card" style={{ maxWidth: '700px' }}>
@@ -56,12 +57,13 @@ function OrderDetail() {
             {ORDER_STAGES.map((stage, index) => {
               const isDone   = index < currentStageIndex;
               const isActive = index === currentStageIndex;
+              const StageIcon = STAGE_ICON[stage];
 
               return (
                 <div key={stage} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
                   <div className="progress-step">
                     <div className={`step-circle ${isDone ? 'done' : ''} ${isActive ? 'active' : ''}`}>
-                      {STAGE_EMOJI[stage]}
+                      <StageIcon size={16} />
                     </div>
                     <span className={`step-label ${isDone ? 'done' : ''} ${isActive ? 'active' : ''}`}>
                       {stage}
@@ -80,7 +82,7 @@ function OrderDetail() {
         {/* Estimated Delivery */}
         {order.estimatedDelivery && order.status !== 'delivered' && order.status !== 'cancelled' && (
           <div className="alert alert-info" style={{ marginBottom: '24px' }}>
-            📅 Estimated Delivery: {new Date(order.estimatedDelivery).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
+            <Calendar size={14} style={{ verticalAlign: 'text-bottom' }} /> Estimated Delivery: {new Date(order.estimatedDelivery).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
           </div>
         )}
 
@@ -114,7 +116,7 @@ function OrderDetail() {
             <p>{order.shippingAddress.name}</p>
             <p>{order.shippingAddress.street}</p>
             <p>{order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.pincode}</p>
-            <p>📞 {order.shippingAddress.phone}</p>
+            <p><Phone size={14} style={{ verticalAlign: 'text-bottom' }} /> {order.shippingAddress.phone}</p>
           </div>
           <div style={{ textAlign: 'right' }}>
             <h3 style={{ marginBottom: '8px' }}>Total Amount</h3>
