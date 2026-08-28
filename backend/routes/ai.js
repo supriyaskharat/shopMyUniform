@@ -1,15 +1,7 @@
 // routes/ai.js
-// The AI Customer Support Agent powered by Google Gemini.
-//
-// How it works:
-// 1. User sends a message from the chat widget
-// 2. We send it to Gemini along with "tool declarations" (functions Gemini can call)
-// 3. Gemini decides which tool to call (e.g. getProducts, getMyOrders)
-// 4. We execute that tool — which runs a real MongoDB query
-// 5. We send the results back to Gemini
-// 6. Gemini generates a final human-friendly response using real data
-//
-// This is called "Function Calling" or "Tool Use" in LLM terminology.
+// AI customer support agent powered by Google Gemini function calling.
+// Gemini picks a tool based on the user's question, we run the real DB query,
+// and send the result back so Gemini can answer with grounded data.
 
 const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -20,10 +12,7 @@ const { protect } = require('../middleware/auth');
 
 const router = express.Router();
 
-// ─── Tool Declarations ────────────────────────────────────────────────────────
-// These tell Gemini what functions it can call and what parameters they accept.
-// Gemini decides on its own WHEN and WHICH tool to call based on the user's question.
-
+// Tools Gemini can call, with the parameters each one accepts.
 const tools = [
   {
     functionDeclarations: [
@@ -74,20 +63,17 @@ const tools = [
   },
 ];
 
-// ─── Tool Executor ─────────────────────────────────────────────────────────────
-// Runs the actual MongoDB queries or returns policy info when Gemini calls a tool.
-
 async function executeTool(toolName, args, userId, userSchoolId) {
   switch (toolName) {
     case 'getProducts': {
       const filter = {};
-      if (args.grade)    filter.grades = args.grade;
-      if (args.category) filter.category = args.category;
-      if (args.gender)   filter.gender = args.gender;
-      if (args.search)   filter.name = { $regex: args.search, $options: 'i' };
+      if (args.grade)    filter.grades = String(args.grade);
+      if (args.category) filter.category = String(args.category);
+      if (args.gender)   filter.gender = String(args.gender);
+      if (args.search)   filter.name = { $regex: String(args.search), $options: 'i' };
 
       // Use the user's school by default if no specific school was requested
-      if (args.schoolId)      filter.school = args.schoolId;
+      if (args.schoolId)      filter.school = String(args.schoolId);
       else if (userSchoolId)  filter.school = userSchoolId;
 
       const products = await Product.find(filter).populate('school', 'name').limit(10);
@@ -176,8 +162,6 @@ async function executeTool(toolName, args, userId, userSchoolId) {
   }
 }
 
-// ─── Chat Endpoint ─────────────────────────────────────────────────────────────
-
 // POST /api/ai/chat — Send a message to the AI agent and get a response
 router.post('/chat', protect, async (req, res) => {
   try {
@@ -186,7 +170,6 @@ router.post('/chat', protect, async (req, res) => {
     // Get current user's info to personalise the AI context
     const user = await User.findById(req.user._id).populate('school', 'name');
 
-    // Step 1: Initialize Gemini with the tools and a system instruction
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.0-flash',
@@ -200,19 +183,22 @@ router.post('/chat', protect, async (req, res) => {
         Keep responses concise and friendly. Use ₹ for prices.`,
     });
 
-    // Step 2: Start a chat session with the previous conversation history
-    const chat = model.startChat({ history });
+    // Gemini only accepts 'user' and 'model' roles — filter out any others.
+    const contents = [
+      ...(history || []).filter((e) => e.role === 'user' || e.role === 'model'),
+      { role: 'user', parts: [{ text: message }] },
+    ];
 
-    // Step 3: Send the user's message to Gemini
-    let result = await chat.sendMessage(message);
+    let result = await model.generateContent({ contents });
+    let response = result.response;
 
-    // Step 4: Handle function calls in a loop
-    // Gemini may call multiple tools in sequence before giving a final answer
-    while (result.response.functionCalls()?.length > 0) {
-      const calls = result.response.functionCalls();
+    // Keep calling tools until Gemini gives a final text reply
+    while (response.functionCalls()?.length > 0) {
+      const calls = response.functionCalls();
 
-      // Step 4a: Execute all tool calls (could be more than one in parallel)
-      const toolResults = await Promise.all(
+      contents.push({ role: 'model', parts: response.candidates[0].content.parts });
+
+      const toolResultParts = await Promise.all(
         calls.map(async (call) => ({
           functionResponse: {
             name: call.name,
@@ -228,12 +214,12 @@ router.post('/chat', protect, async (req, res) => {
         }))
       );
 
-      // Step 4b: Send the tool results back to Gemini so it can generate a response
-      result = await chat.sendMessage(toolResults);
+      contents.push({ role: 'user', parts: toolResultParts });
+      result = await model.generateContent({ contents });
+      response = result.response;
     }
 
-    // Step 5: Extract the final text response from Gemini
-    const reply = result.response.text();
+    const reply = response.text();
     res.json({ success: true, data: { reply } });
   } catch (error) {
     console.error('AI chat error:', error.message);
