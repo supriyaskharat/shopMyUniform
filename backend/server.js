@@ -2,7 +2,8 @@
 // The main entry point for the Express backend.
 // Connects to MongoDB, sets up middleware, and mounts all API routes.
 
-require('dotenv').config(); // Load .env variables first
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') }); // Always load .env from backend/
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
